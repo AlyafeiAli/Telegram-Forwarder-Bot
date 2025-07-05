@@ -56,7 +56,10 @@ class Chat:
                 "access_hash": access_hash
             }
             chats_list.append(chat_dict)
-
+        #To get older channels first
+        chats_list = sorted(chats_list, key=lambda x: x["id"]) 
+        #Sort by title for better readability
+        chats_list = sorted(chats_list, key=lambda x: x["title"])
         with open(CHAT_FILE_PATH, "w") as chats_file:
             json.dump(chats_list, chats_file, indent=4)
         return chats_list
