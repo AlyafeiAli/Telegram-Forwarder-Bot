@@ -21,7 +21,7 @@ class MessageForwardService:
     async def forward_message(self, destination_id: int, message: Message, reply_to: Optional[int] = None) -> Optional[Message]:
         try:
             if message.forward is not None:
-                return await self.client.send_message(destination_id, message)
+                return await self.client.forward_messages(destination_id, message, drop_author=True)
 
             media_path = None
             try:
