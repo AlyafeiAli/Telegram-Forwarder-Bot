@@ -21,19 +21,22 @@ class MessageForwardService:
     async def forward_message(self, destination_id: int, message: Message, reply_to: Optional[int] = None) -> Optional[Message]:
         try:
             if message.forward is not None:
+                print("I'm in message.forward")
                 return await self.client.forward_messages(destination_id, message, drop_author=True)
 
             media_path = None
             try:
-                if message.media:
-                    media_path = await self._download_media(message)
+                # if message.media:
+                #     # media_path = await self._download_media(message)
+                #     print("I'm in message.media")
                 
                 text = message.text or ''
                 
-                if media_path:
+                if message.media:
+                    print("I'm in message.media")
                     return await self.client.send_file(
                         destination_id,
-                        media_path,
+                        message.media,
                         caption=text,
                         reply_to=reply_to
                     )
@@ -60,12 +63,13 @@ class MessageForwardService:
     ) -> Optional[List[Message]]:
         media_paths = []
         try:
-            media_paths = await self._download_album_media(messages)
-            return await self.client.send_file(
+            print("I'm in forward_album")
+            # media_paths = await self._download_album_media(messages)
+            return await self.client.forward_messages(
                 destination_id,
-                media_paths,
-                caption=caption,
-                reply_to=reply_to
+                messages,
+                drop_author=True
+                # reply_to=reply_to
             )
         except Exception as e:
             print(f"Error forwarding album: {e}")
@@ -75,6 +79,7 @@ class MessageForwardService:
 
     async def _download_media(self, message: Message) -> Optional[str]:
         try:
+            print("I'm in _download_media")
             os.makedirs(MEDIA_FOLDER_PATH, exist_ok=True)
             return await self.client.download_media(message, file=MEDIA_FOLDER_PATH)
         except Exception as e:
@@ -83,6 +88,7 @@ class MessageForwardService:
 
     async def _download_album_media(self, messages: List[Message]) -> List[str]:
         media_paths = []
+        print("I'm in _download_album_media")
         for message in messages:
             if message.media:
                 path = await self._download_media(message)
